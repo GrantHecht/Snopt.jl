@@ -42,7 +42,7 @@ function example_snopta!(f, dg, x, deriv)
     return false
 end
 
-# Set global userfun variables if on ARM
+# Set global userfun variables (only used if on ARM or FORCE_GLOBAL_USERFUN is true)
 global _userfun_snsolve! = example_snsolve!
 global _userfun_snopta!  = example_snopta!
 
@@ -87,6 +87,7 @@ function usrcallback_snsolve(func!, status_::Ptr{Cint},
     if fail
         unsafe_store!(status_, -1, 1)
     end
+    return nothing
 end
 
 # snsolve wrapper for userfun (calls global function _userfun_snsolve!)
@@ -115,6 +116,7 @@ function usrcallback_snsolve(status_::Ptr{Cint},
     if fail
         unsafe_store!(status_, -1, 1)
     end
+    return nothing
 end
 
 # snopta wrapper for usrfun (augmented with function pass-in)
@@ -143,6 +145,7 @@ function usrcallback_snopta(func!, status_::Ptr{Cint},
     if fail
         unsafe_store!(status_, -1, 1)
     end
+    return nothing
 end
 
 # snopta wrapper for userfun (calls global function _userfun_snopta!)
@@ -171,6 +174,7 @@ function usrcallback_snopta(status_::Ptr{Cint},
     if fail
         unsafe_store!(status_, -1, 1)
     end
+    return nothing
 end
 
 # Function to get userfun pointer

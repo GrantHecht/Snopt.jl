@@ -23,12 +23,12 @@ end
 function openfiles(printnum, sumnum, printfile, sumfile)
     # open files for printing (not part of snopt distribution)
     printerr = Cint[0]
-    sumerr = Cint[0]
+    sumerr   = Cint[0]
     ccall( (:openfiles_, snoptlib), Nothing,
         (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cuchar}, Ptr{Cuchar}),
         printnum, sumnum, printerr, sumerr, printfile, sumfile)
 
-    if printerr[1] != 0
+    if printnum > 0 && printerr[1] != 0
         @warn "failed to open print file"
     end
     if sumerr[1] != 0
