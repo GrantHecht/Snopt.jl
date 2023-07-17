@@ -10,7 +10,7 @@ const snoptlib = joinpath(@__DIR__, "..", "deps", "lib", "libsnopt")
 include_dependency(snoptlib)
 
 # Global flag to force use of global userfun (instead of runtime closure)
-const FORCE_GLOBAL_USERFUN = true
+const FORCE_GLOBAL_USERFUN = false
 if FORCE_GLOBAL_USERFUN
     @warn "Forcing global userfun. This is not recommended and should only be used for debugging."
 end

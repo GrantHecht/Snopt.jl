@@ -12,8 +12,8 @@ unix_use_gfortran   = true      # Set to false to use ifort
 unix_use_ninja      = true      # Set to false to use GNU make
 
 # BLAS
-use_BLAS     = true
-use_MKL      = true
+use_BLAS     = false
+use_MKL      = false
 use_OpenBLAS = false
 OpenBLAS_DIR = joinpath("C:\\Source","OpenBLAS","install","share","cmake","OpenBLAS") 
 
