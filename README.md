@@ -31,7 +31,30 @@ NOTE: This package was originally forked from [byuflowlab/Snopt.jl](https://gith
 
 5. Mofify the build script at ~/.julia/dev/Snopt/deps/build.jl to reflect the requirements of your system and the desired BLAS library (if any).
 
-6. Compile the fortran code.
+    CMake Options:
+    * `cmake_path` - Should be set to "cmake" (if cmake is on system's PATH) or the full path to the cmake executable.
+
+    Windows Build Options:
+    * `win_use_msvc` - If true, will use [Microsoft Visual Studio](https://visualstudio.microsoft.com/downloads/) (MSVC) at the CMake generator. Otherwise, will default to using MinGW Makefiles which requires mingw32-make to be on the system's PATH (mingw32-make is included with builds of [MinGW-w64](https://github.com/niXman/mingw-builds-binaries/releases))
+      
+      If using MSVC on Windows, you must ensure that a Fortran compiler has been installed and setup with MSVC. Users are recommended to use the [Intel Fortran compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/fortran-compiler.html#gs.38acdw) (ifort) installed with the [Intel oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html#gs.38afbg) when using MSVC as the generator.
+
+      If NOT using MSVC on Windows, you must ensure a Fortran compiler is also on the system's PATH. Users are recommended to use the GNU Fortran compiler (gfortran), which is also included in builds of MinGW-w64.
+      
+    * `win_msvc_version` - If `win_use_msvc = true`, this should be set to the version number system's installation of MSVC.
+    * `win_msvc_year` - If `win_use_msvc = true`, this should be set to release year of the system's installation of MSVC.
+  
+    Unix (Linux/Mac) Options:
+    * `unix_use_gfortran` - TODO: currently unix builds default to first Fortran compiler found on system's PATH.
+    * `unix_use_ninja` - If true, cmake will use ninja for the project generator. Otherwise, will default to GNU Makefiles.
+  
+    BLAS Options:
+    * `use_BLAS` - If true, will use the BLAS library specified by one of the following options. Otherwise, build will employ the default BLAS included with SNOPT.
+    * `use_MKL` - If true, will use the MKL BLAS library (the `use_BLAS` option must also be true). [Intel MKL](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html) must be properly installed on the user's system. MKL is included with the Intel oneAPI Base Toolkit (the recommended method for installing MKL).
+    * `use_OpenBLAS` - If true, will use the OpenBLAS library (the `use_BLAS` option must also be true). [OpenBLAS](https://www.openblas.net/) must be properly installed on the user's system.
+    * `OpenBLAS_DIR` - If using OpenBLAS, cmake can fail to find the required library if it is not installed globally. If this problem occurs, `OpenBLAS_DIR` should be set to the OpenBLAS directory that contains the file "OpenBLASConfig.cmake".
+
+7. Compile the fortran code.
 ```julia
 (v1.9) pkg> build Snopt
 ```
