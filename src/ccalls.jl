@@ -2,7 +2,7 @@
 # Contains wrappers of SNOPT functions
 
 # wrapper for snInit
-function sninit(nx, nf)
+function sninit(nx, nf, printnum, sumnum)
     # temporary working arrays
     minlen = 500
     lencw = minlen
@@ -13,20 +13,20 @@ function sninit(nx, nf)
     ccall( (:sninit_, snoptlib), Nothing,
         (Ref{Cint}, Ref{Cint}, Ptr{Cuchar}, Ref{Cint}, Ptr{Cint},
         Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-        PRINTNUM, SUMNUM, w.cw, w.lencw, w.iw,
+        printnum, sumnum, w.cw, w.lencw, w.iw,
         w.leniw, w.rw, w.lenrw)
 
     return w
 end
 
 # wrapper for openfiles. not defined with snopt, fortran file supplied in repo (from pyoptsparse)
-function openfiles(printfile, sumfile)
+function openfiles(printnum, sumnum, printfile, sumfile)
     # open files for printing (not part of snopt distribution)
     printerr = Cint[0]
     sumerr = Cint[0]
     ccall( (:openfiles_, snoptlib), Nothing,
         (Ref{Cint}, Ref{Cint}, Ptr{Cint}, Ptr{Cint}, Ptr{Cuchar}, Ptr{Cuchar}),
-        PRINTNUM, SUMNUM, printerr, sumerr, printfile, sumfile)
+        printnum, sumnum, printerr, sumerr, printfile, sumfile)
 
     if printerr[1] != 0
         @warn "failed to open print file"
@@ -39,11 +39,11 @@ function openfiles(printfile, sumfile)
 end
 
 # wrapper for closefiles. not defined with snopt, fortran file supplied in repo (from pyoptsparse)
-function closefiles()
+function closefiles(printnum, sumnum)
     # close output files
     ccall( (:closefiles_, snoptlib), Nothing,
         (Ref{Cint}, Ref{Cint}),
-        PRINTNUM, SUMNUM)
+        printnum, sumnum)
 
     return nothing
 end
@@ -59,7 +59,7 @@ function flushfiles()
 end
 
 # wrapper for snSet, snSeti, snSetr
-function setoptions(options, work)
+function setoptions(options, work, printnum, sumnum)
 
     # --- set options ----
     errors = Cint[0]
@@ -86,7 +86,7 @@ function setoptions(options, work)
                 ccall( (:snset_, snoptlib), Nothing,
                     (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
                     Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-                    value, PRINTNUM, SUMNUM, errors,
+                    value, printnum, sumnum, errors,
                     work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
             end
         elseif isinteger(value)
@@ -94,7 +94,7 @@ function setoptions(options, work)
             ccall( (:snseti_, snoptlib), Nothing,
                 (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
                 Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-                buffer, value, PRINTNUM, SUMNUM, errors,
+                buffer, value, printnum, sumnum, errors,
                 work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
 
         elseif isreal(value)
@@ -102,7 +102,7 @@ function setoptions(options, work)
             ccall( (:snsetr_, snoptlib), Nothing,
                 (Ptr{Cuchar}, Ref{Cdouble}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
                 Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-                buffer, value, PRINTNUM, SUMNUM, errors,
+                buffer, value, printnum, sumnum, errors,
                 work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
         end
 
@@ -116,7 +116,7 @@ function setoptions(options, work)
 end
 
 # wrapper for snMemA
-function setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
+function setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work, printnum, sumnum)
 
     mincw = Cint[0]
     miniw = Cint[0]
@@ -159,7 +159,7 @@ function setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
         ccall( (:snseti_, snoptlib), Nothing,
             (Ptr{Cuchar}, Ref{Cint}, Ref{Cint}, Ref{Cint}, Ptr{Cint},
             Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}),
-            buffer, value, PRINTNUM, SUMNUM, errors,
+            buffer, value, printnum, sumnum, errors,
             work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
         if errors[1] > 0
             @warn errors[1], " error encountered while lengths in options from memory sizing"
@@ -174,7 +174,7 @@ function snopta!(Start::Cint,
                  nxname::Integer, nFname::Integer,
                  ObjAdd::Float64, ObjRow::Integer, 
                  Prob::Vector{Cuchar}, usrfun::Union{Base.CFunction, Ptr{Nothing}},
-                 iAfun::Vector{IT1}, jAvar::Vector{IT2}, 
+                 iAfun::Vector{IT1},  jAvar::Vector{IT2}, 
                  lenA::Integer, neA::Integer, A::Vector{Float64},
                  iGfun::Vector{Cint}, jGvar::Vector{Cint}, 
                  lenG::Integer, neG::Integer,
@@ -185,11 +185,11 @@ function snopta!(Start::Cint,
                  INFO::Vector{Cint}, 
                  mincw::Vector{Cint}, miniw::Vector{Cint}, minrw::Vector{Cint}, 
                  ns::Vector{Cint}, nInf::Vector{Cint}, sInf::Vector{Cdouble},
-                 cu::Vector{Cuchar}, lencu::Integer, 
-                 iu::Vector{Cint}, leniu::Integer, 
+                 cu::Vector{Cuchar},  lencu::Integer, 
+                 iu::Vector{Cint},    leniu::Integer, 
                  ru::Vector{Float64}, lenru::Integer,
-                 cw::Vector{Cuchar}, lencw::Integer, 
-                 iw::Vector{Cint}, leniw::Integer, 
+                 cw::Vector{Cuchar},  lencw::Integer, 
+                 iw::Vector{Cint},    leniw::Integer, 
                  rw::Vector{Float64}, lenrw::Integer) where {IT1<:Integer, IT2<:Integer}
 
     ccall( (:snopta_, snoptlib), Nothing,

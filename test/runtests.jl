@@ -3,8 +3,6 @@ using Test
 using SparseArrays
 
 # -----------------------------------------
-Snopt.SUMNUM = 18
-
 @testset "rosenbrock" begin
 
 function rosenbrock(g, df, dg, x, deriv)
@@ -27,7 +25,7 @@ ug = []
 rows = []
 cols = []
 
-xopt, fopt, info, out = snsolve(rosenbrock, x0, lx, ux, lg, ug, rows, cols)
+xopt, fopt, info, out = snsolve(rosenbrock, x0, lx, ux, lg, ug, rows, cols; sumnum = 18)
 
 @test isapprox(xopt[1], 1.0; atol=1e-6)
 @test isapprox(xopt[2], 1.0; atol=1e-6)
@@ -102,7 +100,7 @@ options = Dict(
     "Derivative option" => 0
 )
 
-xopt, fopt, info, out = snsolve(barnes, x0, lx, ux, lg, ug, rows, cols, options)
+xopt, fopt, info, out = snsolve(barnes, x0, lx, ux, lg, ug, rows, cols, options; sumnum = 18)
 @test isapprox(xopt[1], 49.5263; atol=1e-4)
 @test isapprox(xopt[2], 19.6228; atol=1e-4)
 @test isapprox(fopt, -31.6368; atol=1e-2)
@@ -209,7 +207,7 @@ options = Dict(
     "Verify level" => 1
 )
 
-xopt, fopt, info, out = snsolve(barnesgrad, x0, lx, ux, lg, ug, rows, cols, options)
+xopt, fopt, info, out = snsolve(barnesgrad, x0, lx, ux, lg, ug, rows, cols, options; sumnum = 18)
 
 @test isapprox(xopt[1], 49.5263; atol=1e-4)
 @test isapprox(xopt[2], 19.6228; atol=1e-4)
@@ -260,7 +258,7 @@ options = Dict(
 )
 
 
-xopt, fopt, info, out = snsolve(sparsegrad, x0, lx, ux, lg, ug, rows, cols, options)
+xopt, fopt, info, out = snsolve(sparsegrad, x0, lx, ux, lg, ug, rows, cols, options; sumnum = 18)
 
 @test isapprox(xopt[1], 1.0; atol=1e-6)
 @test isapprox(xopt[2], 2.0; atol=1e-6)
@@ -293,7 +291,7 @@ function sparsegrad2(g, df, dg, x, deriv)
 
 end
 
-xopt, fopt, info, out = snsolve(sparsegrad2, x0, lx, ux, lg, ug, rows, cols, options)
+xopt, fopt, info, out = snsolve(sparsegrad2, x0, lx, ux, lg, ug, rows, cols, options; sumnum = 18)
 
 @test isapprox(xopt[1], 1.5; atol=1e-6)
 @test isapprox(xopt[2], 3.0; atol=1e-6)
@@ -321,7 +319,7 @@ end # sparse test set
     options = Dict(
         "Derivative option" => 0
     )
-    xopt, fopt, info, out = snsolve(matyas, x0, lx, ux, lg, ug, rows, cols, options)
+    xopt, fopt, info, out = snsolve(matyas, x0, lx, ux, lg, ug, rows, cols, options; sumnum = 18)
     @test isapprox(xopt[1], 0.0; atol=1e-4)
     @test isapprox(xopt[2], 0.0; atol=1e-4)
     @test isapprox(fopt, 0.0; atol=1e-3)
@@ -356,7 +354,7 @@ end
         "Summary file" => summary_file
     )
     
-    xopt, fopt, info, out = snsolve(matyas, x0, lx, ux, lg, ug, rows, cols, options)
+    xopt, fopt, info, out = snsolve(matyas, x0, lx, ux, lg, ug, rows, cols, options; sumnum = 18)
 
     # Test that we got a successful info code.
     @test out.info_code == 1
@@ -464,7 +462,7 @@ options = Dict(
 )
 
 xopt, fopt, info, out = snopta(barnesgrad_snopta, start, ObjAdd, ObjRow, iAfun, jAvar, A,
-                            iGfun, jGvar, lx, ux, lg, ug, options)
+                            iGfun, jGvar, lx, ux, lg, ug, options; sumnum = 18)
 
 @test isapprox(xopt[1], 49.5263; atol=1e-4)
 @test isapprox(xopt[2], 19.6228; atol=1e-4)

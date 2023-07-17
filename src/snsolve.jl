@@ -1,11 +1,12 @@
 
 # commonly used convenience method to provide regular starting point (cold start)
 function snsolve(func!, x0::T, lx, ux, lg, ug, rows, cols, 
-    options=Dict(); A=[], names=Names(), objadd=0.0) where T<:Vector
+    options=Dict(); A=[], names=Names(), objadd=0.0, printnum=18, sumnum=6) where T<:Vector
 
     start = ColdStart(x0, length(lg)+1)
     
-    return snsolve(func!, start, lx, ux, lg, ug, rows, cols, options, A=A, names=names, objadd=objadd)
+    return snsolve(func!, start, lx, ux, lg, ug, rows, cols, options;
+        A=A, names=names, objadd=objadd, printnum=printnum, sumnum=sumnum)
 end
 
 """
@@ -35,7 +36,7 @@ Main function call into snOptA.
 - `out::Outputs`: various outputs
 """
 function snsolve(func!, start::Start, lx, ux, lg, ug, rows, cols, 
-    options=Dict(); A=[], names=Names(), objadd=0.0)
+    options=Dict(); A=[], names=Names(), objadd=0.0, printnum=18, sumnum=6)
     # --- number of functions ----
     nx = length(start.x)
     ng = length(lg)
@@ -95,17 +96,17 @@ function snsolve(func!, start::Start, lx, ux, lg, ug, rows, cols,
     if haskey(options, "Summary file")
         sumfile = options["Summary file"]
     end
-    openfiles(printfile, sumfile)
+    openfiles(printnum, sumnum, printfile, sumfile)
 
     # ----- initialize -------
-    work = sninit(nx, nf)
+    work = sninit(nx, nf, printnum, sumnum)
 
     # --- set options ----
-    setoptions(options, work)
+    setoptions(options, work, printnum, sumnum)
 
     # ---- set memory requirements ------
     INFO = Cint[0]
-    setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work)
+    setmemory(INFO, nf, nx, nxname, nfname, neA, neG, work, printnum, sumnum)
 
     # --- call snopta ----
     mincw = Cint[0]
@@ -132,7 +133,7 @@ function snsolve(func!, start::Start, lx, ux, lg, ug, rows, cols,
             work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
 
     # close output files
-    closefiles()
+    closefiles(printnum, sumnum)
 
     # pack outputs
     warm = WarmStart(ns[1], start.xstate, start.fstate, start.x, start.f, 

@@ -29,7 +29,7 @@ Main function call into snOptA.
 - `out::Outputs`: various outputs
 """
 function snopta(func!, start::Start, ObjAdd, ObjRow, iAfun, jAvar, A, iGfun, jGvar, xlow, xupp, Flow, Fupp, options = Dict();
-                names = Names())
+                names = Names(), printnum = 18, sumnum = 6)
 
     # Number of variables and functions
     n  = length(start.x)
@@ -81,17 +81,17 @@ function snopta(func!, start::Start, ObjAdd, ObjRow, iAfun, jAvar, A, iGfun, jGv
     if haskey(options, "Summary file")
         sumfile = options["Summary file"]
     end
-    openfiles(printfile, sumfile)
+    openfiles(printnum, sumnum, printfile, sumfile)
 
     # Initialize
-    work = sninit(n, nF)
+    work = sninit(n, nF, printnum, sumnum)
 
     # Set options
-    setoptions(options, work)
+    setoptions(options, work, printnum, sumnum)
 
     # Set memory requirements
     INFO = Cint[0]
-    setmemory(INFO, nF, n, nxname, nfname, neA, neG, work)
+    setmemory(INFO, nF, n, nxname, nfname, neA, neG, work, printnum, sumnum)
 
     # Call snopta
     mincw = Cint[0]
@@ -119,7 +119,7 @@ function snopta(func!, start::Start, ObjAdd, ObjRow, iAfun, jAvar, A, iGfun, jGv
             work.cw, work.lencw, work.iw, work.leniw, work.rw, work.lenrw)
 
     # Close files
-    closefiles()
+    closefiles(printnum, sumnum)
 
     # Pack outputs
     warm = WarmStart(ns[1], start.xstate, start.fstate, start.x, start.f, start.xmul, start.fmul)
