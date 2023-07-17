@@ -1,6 +1,6 @@
 # Snopt.jl
 
-Julia interface to SNOPT v7 (must obtain a licensed copy of SNOPT separately).
+Julia interface to SNOPT v7.7.7 (must obtain a licensed copy of SNOPT separately).
 
 This package is a wrapper of SNOPT v7.7.7 and provides two Julia interfaces to the subroutine snOptA: 
 1. `snsolve`, a convenient interface with auto-populating sparsity patterns, vector lengths, variable/function naming, etc... 
