@@ -2,13 +2,17 @@
 
 Julia interface to SNOPT v7 (must obtain a licensed copy of SNOPT separately).
 
-This package is a basic wrapper to the Fortran functions. It follows the snopt functions, but with some conveniences in auto-populating sparsity patterns, vector lengths, making names the appropriate size, etc.
+This package is a wrapper of SNOPT v7.7.7 and provides two Julia interfaces to the subroutine snOptA: 
+1. `snsolve`, a convenient interface with auto-populating sparsity patterns, vector lengths, variable/function naming, etc... 
+2. `snopta`, an inferface that directly replicates that of the snOptA FORTRAN subroutine. 
+
+NOTE: This package was originally forked from [byuflowlab/Snopt.jl](https://github.com/byuflowlab/Snopt.jl), but has recieved significant modification.
 
 ### To Install
 
 1. Checkout the repo for development:
 ```julia
-(v1.0) pkg> dev https://github.com/GrantHecht/Snopt.jl.git
+(v1.9) pkg> dev https://github.com/GrantHecht/Snopt.jl.git
 ```
 
 2. Copy your SNOPT source files into ~/.julia/dev/Snopt/deps/src.
@@ -25,15 +29,17 @@ This package is a basic wrapper to the Fortran functions. It follows the snopt f
 
 4.  sn27lu.f, sn27lu77.f, and sn27lu90.f contain duplicate symbols.  You'll need to keep only one file.  I deleted the latter two files. If you are building with SNOPT v7.7 and do not define any user functions, you will also need to delete snopth.f.
 
-5. Compile the fortran code.
+5. Mofify the build script at ~/.julia/dev/Snopt/deps/build.jl to reflect the requirements of your system and the desired BLAS library (if any).
+
+6. Compile the fortran code.
 ```julia
-(v1.0) pkg> build Snopt
+(v1.9) pkg> build Snopt
 ```
 
 ## Run tests
 
 ```julia
-(v1.0) pkg> test Snopt
+(v1.9) pkg> test Snopt
 ```
 
 ## To Use
@@ -42,4 +48,4 @@ This package is a basic wrapper to the Fortran functions. It follows the snopt f
 using Snopt
 ```
 
-See examples in tests.
+See examples in test and examples directories.
