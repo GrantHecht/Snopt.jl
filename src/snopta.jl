@@ -62,21 +62,7 @@ function snopta(func!, start::Start, ObjAdd, ObjRow, iAfun, jAvar, A, iGfun, jGv
     jAvar_c.= jAvar
 
     # Setup user function
-    wrapper = function(status_::Ptr{Cint}, n::Cint, x_::Ptr{Cdouble},
-        needf::Cint, nF::Cint, f_::Ptr{Cdouble}, needG::Cint, lenG::Cint,
-        G_::Ptr{Cdouble}, cu::Ptr{Cuchar}, lencu::Cint, iu::Ptr{Cint},
-        leniu::Cint, ru::Ptr{Cdouble}, lenru::Cint)
-
-        usrcallback_snopta(func!, status_, n, x_, needf, nF, f_, needG, lenG,
-            G_, cu, lencu, iu, leniu, ru, lenru)
-
-        return nothing
-    end
-
-    # c wrapper to callback function
-    usrfun = @cfunction($wrapper, Cvoid, (Ptr{Cint}, Ref{Cint}, Ptr{Cdouble},
-        Ref{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}, Ref{Cint}, Ptr{Cdouble},
-        Ptr{Cuchar}, Ref{Cint}, Ptr{Cint}, Ref{Cint}, Ptr{Cdouble}, Ref{Cint}))
+    usrfun = get_user_function_pointer_snopta(func!)
 
     # Setup jacobian sparsity pattern
     lenG    = length(iGfun)
