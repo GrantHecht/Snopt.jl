@@ -5,7 +5,8 @@ using SparseArrays
 export snsolve, snopta
 export ColdStart, WarmStart
 
-const snoptlib = joinpath(@__DIR__, "..", "deps", "libsnopt")
+# Set path do snopt dynamic library
+const snoptlib = joinpath(@__DIR__, "..", "deps", "lib", "libsnopt")
 include_dependency(snoptlib)
 
 """
@@ -28,6 +29,7 @@ include("Outputs.jl")
 include("ccalls.jl")
 
 # SNOPT interfaces
+include("userfun.jl")
 include("snsolve.jl")
 include("snopta.jl")
 

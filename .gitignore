@@ -31,7 +31,14 @@
 
 # snopt
 fort*
-deps/src
+deps/src/*.f
+deps/src/*.f90
+deps/src/*.c
+deps/src/*.cpp
+deps/src/*.i
+deps/src/*.info
+deps/src/Submakefile
+!deps/src/fileio.f90
 
 # Julia
 Manifest.toml
